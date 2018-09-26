@@ -8,7 +8,6 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +17,7 @@ import com.egtinteractive.orm.annotations.AllowedClasses;
 import com.egtinteractive.orm.annotations.Column;
 import com.egtinteractive.orm.annotations.Entity;
 import com.egtinteractive.orm.annotations.Id;
-import com.egtinteractive.orm.annotations.Tabel;
+import com.egtinteractive.orm.annotations.Table;
 import com.egtinteractive.orm.annotations.Transient;
 
 import exceptions.ColumnNameNotFoundException;
@@ -116,33 +115,17 @@ public class ReflectiveUtils {
 
     public static <E> String getTableName(final Class<E> classGen, final String schema) {
 	validateClass(classGen);
-	if (!classGen.isAnnotationPresent(Tabel.class)) {
+	if (!classGen.isAnnotationPresent(Table.class)) {
 	    return classGen.getSimpleName();
 	}
-	final Tabel table = classGen.getAnnotation(Tabel.class);
+	final Table table = classGen.getAnnotation(Table.class);
 	if (!table.schema().equals("") && !table.schema().equals(schema)) {
 	    throw new IllegalArgumentException(schema);
 	}
 	return (table.name().equals("")) ? classGen.getSimpleName() : table.name();
     }
 
-    public static <E> List<E> getList(Class<E> classGen, ResultSet result, Map<String, Field> mapColumnField) {
-	validateClass(classGen);
-	if (result == null || mapColumnField == null) {
-	    throw new IllegalArgumentException();
-	}
-	try {
-	    final List<E> list = new ArrayList<>();
-	    while (result.next()) {
-		list.add(getEntity(classGen, mapColumnField, result));
-	    }
-	    return list;
-	} catch (SQLException e) {
-	    throw new IllegalStateException();
-	}
-    }
-
-    private static <E> E getEntity(Class<E> classGen, Map<String, Field> mapColumnField, ResultSet result) {
+    public static <E> E getEntity(Class<E> classGen, Map<String, Field> mapColumnField, ResultSet result) {
 	try {
 	    final E instance = classGen.newInstance();
 	    for (final String s : mapColumnField.keySet()) {
