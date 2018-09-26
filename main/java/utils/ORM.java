@@ -5,10 +5,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -16,11 +16,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import com.egtinteractive.orm.annotations.Entity;
-
-import exceptions.ORMmanegerException;
+import com.egtinteractive.orm.annotations.*;
 
 import static utils.ReflectiveUtils.*;
+
+import exceptions.ORMmanegerException;
 
 public class ORM implements Functionality {
     private final Connection connection;
@@ -70,7 +70,7 @@ public class ORM implements Functionality {
     @Override
     public <E> List<E> findAll(final Class<E> classGen) {
 
-	final Map<String, Field> mapColumnField = getMapColumnField(classGen);
+	final Map<String, String> mapColumnField = getColumnToFieldMap(classGen, Column.class, Transient.class, "name");
 	final List<E> entityList = new ArrayList<>();
 
 	final StringBuilder columnNames = new StringBuilder(mapColumnField.keySet().toString());
@@ -81,11 +81,11 @@ public class ORM implements Functionality {
 	selectStatement.append("SELECT ").append(columnNames.toString()).append(" FROM ");
 
 	try (final Statement statement = connection.createStatement();
-		final ResultSet resultSet = statement.executeQuery(selectStatement
-			.append(getTableName(classGen, connection.getSchema())).append(";").toString())) {
+		final ResultSet resultSet = statement
+			.executeQuery(selectStatement.append(getTableName(classGen)).append(";").toString())) {
 
 	    while (resultSet.next()) {
-		E newEntity = getEntity(classGen, mapColumnField, resultSet);
+		E newEntity = getEntityFromRecord(classGen, resultSet, mapColumnField);
 		entityList.add(newEntity);
 	    }
 	    return entityList;
@@ -93,6 +93,25 @@ public class ORM implements Functionality {
 	    throw new ORMmanegerException();
 	}
 
+    }
+
+    private <E> E getEntityFromRecord(final Class<E> classGen, final ResultSet rs,
+	    final Map<String, String> columnToFieldMap) throws SQLException {
+	E newEntity = getEntity(classGen);
+	final ResultSetMetaData rsMeta = rs.getMetaData();
+	for (int i = 1; i <= rsMeta.getColumnCount(); i++) {
+	    final String columnName = rsMeta.getColumnName(i);
+	    final String fieldName = columnToFieldMap.get(columnName);
+
+	    final Object fieldValue = rs.getObject(i);
+	    setField(newEntity, fieldName, fieldValue);
+	}
+	return newEntity;
+    }
+
+    private String getTableName(Class<?> classGen) {
+	final String defaultTable = classGen.getSimpleName();
+	return getAnnotationProperty(classGen, Table.class, "name", defaultTable);
     }
 
 }
