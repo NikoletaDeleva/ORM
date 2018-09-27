@@ -1,14 +1,16 @@
-package utils;
+package com.egtinteractive.orm.utils;
+
+import static com.egtinteractive.orm.utils.ReflectionUtils.*;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -17,10 +19,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import com.egtinteractive.orm.annotations.*;
-
-import static utils.ReflectiveUtils.*;
-
-import exceptions.ORMmanegerException;
+import com.egtinteractive.orm.exceptions.ORMmanegerException;
 
 public class ORM implements Functionality {
     private final Connection connection;
@@ -70,19 +69,17 @@ public class ORM implements Functionality {
     @Override
     public <E> List<E> findAll(final Class<E> classGen) {
 
-	final Map<String, String> mapColumnField = getColumnToFieldMap(classGen, Column.class, Transient.class, "name");
+	final Map<String, Field> mapColumnField = getColumnToFieldMap(classGen);
 	final List<E> entityList = new ArrayList<>();
 
-	final StringBuilder columnNames = new StringBuilder(mapColumnField.keySet().toString());
-
-	columnNames.delete(0, 1).delete(columnNames.length() - 1, columnNames.length());
+	final String columnNames = getColumnNamesFromFields(mapColumnField);
+	final String tableName = getTableName(classGen);
 
 	final StringBuilder selectStatement = new StringBuilder();
-	selectStatement.append("SELECT ").append(columnNames.toString()).append(" FROM ");
+	selectStatement.append("SELECT ").append(columnNames).append(" FROM ").append(tableName).append(";");
 
 	try (final Statement statement = connection.createStatement();
-		final ResultSet resultSet = statement
-			.executeQuery(selectStatement.append(getTableName(classGen)).append(";").toString())) {
+		final ResultSet resultSet = statement.executeQuery(selectStatement.toString())) {
 
 	    while (resultSet.next()) {
 		E newEntity = getEntityFromRecord(classGen, resultSet, mapColumnField);
@@ -95,23 +92,12 @@ public class ORM implements Functionality {
 
     }
 
-    private <E> E getEntityFromRecord(final Class<E> classGen, final ResultSet rs,
-	    final Map<String, String> columnToFieldMap) throws SQLException {
-	E newEntity = getEntity(classGen);
-	final ResultSetMetaData rsMeta = rs.getMetaData();
-	for (int i = 1; i <= rsMeta.getColumnCount(); i++) {
-	    final String columnName = rsMeta.getColumnName(i);
-	    final String fieldName = columnToFieldMap.get(columnName);
-
-	    final Object fieldValue = rs.getObject(i);
-	    setField(newEntity, fieldName, fieldValue);
-	}
-	return newEntity;
+    @Override
+    public <E> E find(Class<E> classGen, String primaryKey) {
+	// TODO Auto-generated method stub
+	return null;
     }
 
-    private String getTableName(Class<?> classGen) {
-	final String defaultTable = classGen.getSimpleName();
-	return getAnnotationProperty(classGen, Table.class, "name", defaultTable);
-    }
+    
 
 }
