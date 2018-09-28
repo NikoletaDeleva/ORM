@@ -24,15 +24,14 @@ import com.egtinteractive.orm.annotations.*;
 import com.egtinteractive.orm.exceptions.ORMmanegerException;
 import com.mysql.cj.jdbc.MysqlDataSource;
 
-public class ORM implements Functionality {
+public class ORM implements Functionality, AutoCloseable {
     private final Connection connection;
 
     private ORM(final Connection connection) {
 	this.connection = connection;
-	;
     }
 
-    public static ORM getConnection(DBCredentials credentials) {
+    public static ORM getConnectionAndCraete(DBCredentials credentials) {
 	try {
 	    MysqlDataSource dataSource = new MysqlDataSource();
 
@@ -49,12 +48,8 @@ public class ORM implements Functionality {
 
     }
 
-    public void closeConnection() {
-	try {
-	    connection.close();
-	} catch (SQLException e) {
-	    throw new ORMmanegerException();
-	}
+    public Connection getConnection() {
+	return connection;
     }
 
     @Override
@@ -79,7 +74,7 @@ public class ORM implements Functionality {
 	    }
 	    return entityList;
 	} catch (SQLException e) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(e);
 	}
 
     }
@@ -88,6 +83,15 @@ public class ORM implements Functionality {
     public <E> E find(Class<E> classGen, String primaryKey) {
 
 	return null;
+    }
+
+    @Override
+    public void close() throws Exception {
+	try {
+	    connection.close();
+	} catch (SQLException e) {
+	    throw new ORMmanegerException();
+	}
     }
 
 }

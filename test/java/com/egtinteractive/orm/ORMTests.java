@@ -16,7 +16,7 @@ public class ORMTests {
 
 	DBCredentials credentials = new DBCredentials();
 
-	final ORM orm = ORM.getConnection(credentials);
+	final ORM orm = ORM.getConnectionAndCraete(credentials);
 
 	List<?> entityList = orm.findAll(empl);
 
@@ -29,7 +29,6 @@ public class ORMTests {
 	    }
 	}
 	assertTrue(classMatch);
-	orm.closeConnection();
     }
 
     @DataProvider
