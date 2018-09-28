@@ -18,44 +18,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.sql.DataSource;
+
 import com.egtinteractive.orm.annotations.*;
 import com.egtinteractive.orm.exceptions.ORMmanegerException;
+import com.mysql.cj.jdbc.MysqlDataSource;
 
 public class ORM implements Functionality {
     private final Connection connection;
-    private final Properties properties;
-    private final List<Class<? extends Annotation>> requiredAnnotations;
 
-    private ORM(final Connection connection, final Properties properties) {
+    private ORM(final Connection connection) {
 	this.connection = connection;
-	this.properties = properties;
-	requiredAnnotations = new ArrayList<>();
-	requiredAnnotations.add(Entity.class);
+	;
     }
 
-    public static ORM getConnection() {
-	final String path = "src" + File.separator + "main" + File.separator + "resources" + File.separator
-		+ "configuration.properties";
-
+    public static ORM getConnection(DBCredentials credentials) {
 	try {
-	    final Properties properties = createProperties(path);
-	    Connection connection = DriverManager.getConnection(properties.getProperty("URL"), properties);
-	    return new ORM(connection, properties);
+	    MysqlDataSource dataSource = new MysqlDataSource();
+
+	    dataSource.setUser(credentials.getUSER());
+	    dataSource.setPassword(credentials.getPASSWORD());
+	    dataSource.setDatabaseName(credentials.getDBNane());
+	    dataSource.setPort(Integer.parseInt(credentials.getPort()));
+
+	    Connection connection = dataSource.getConnection();
+	    return new ORM(connection);
 	} catch (Exception e) {
 	    throw new ORMmanegerException();
 	}
 
-    }
-
-    private static Properties createProperties(final String path) {
-	try {
-	    final Reader reader = new FileReader(path);
-	    final Properties properties = new Properties();
-	    properties.load(reader);
-	    return properties;
-	} catch (final IOException e) {
-	    throw new RuntimeException();
-	}
     }
 
     public void closeConnection() {
@@ -68,6 +59,7 @@ public class ORM implements Functionality {
 
     @Override
     public <E> List<E> findAll(final Class<E> classGen) {
+	validate(classGen);
 
 	final Map<String, Field> mapColumnField = getColumnToFieldMap(classGen);
 	final List<E> entityList = new ArrayList<>();
@@ -82,22 +74,20 @@ public class ORM implements Functionality {
 		final ResultSet resultSet = statement.executeQuery(selectStatement.toString())) {
 
 	    while (resultSet.next()) {
-		E newEntity = getEntityFromRecord(classGen, resultSet, mapColumnField);
+		E newEntity = getEntity(classGen, resultSet, mapColumnField);
 		entityList.add(newEntity);
 	    }
 	    return entityList;
 	} catch (SQLException e) {
-	    throw new ORMmanegerException();
+	    throw new IllegalArgumentException();
 	}
 
     }
 
     @Override
     public <E> E find(Class<E> classGen, String primaryKey) {
-	// TODO Auto-generated method stub
+
 	return null;
     }
-
-    
 
 }

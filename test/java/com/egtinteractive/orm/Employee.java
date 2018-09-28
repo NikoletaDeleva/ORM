@@ -1,19 +1,20 @@
-package com.egtinteractive.orm.pojo;
+package com.egtinteractive.orm;
 
 import com.egtinteractive.orm.annotations.*;
+
 @Entity
 @Table(name = "EMPLOYEE")
-public class Employee {  
+public class Employee {
     @Id
     @Column(name = "id")
     private int id;
-    
+
     @Column(name = "first_name")
     private String firstName;
-    
+
     @Column(name = "last_name")
     private String lastName;
-    
+
     @Column(name = "salary")
     private int salary;
 
@@ -56,5 +57,10 @@ public class Employee {
 
     public void setSalary(int salary) {
 	this.salary = salary;
+    }
+
+    @Override
+    public String toString() {
+	return this.getFirstName() + " " + this.getLastName() + " " + this.getSalary();
     }
 }
