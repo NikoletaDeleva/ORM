@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -19,14 +20,15 @@ import com.egtinteractive.orm.utils.DBCredentials;
 import com.egtinteractive.orm.utils.ORM;
 
 public class Testing {
-
+    @BeforeTest
+    
     @DataProvider(name = "employees")
     public Object[][] insertCars() {
 	DBCredentials credentials = new DBCredentials();
 	final ORM orm = ORM.getConnectionAndCraete(credentials);
 	final int count = ThreadLocalRandom.current().nextInt(10, 30);
 	Connection con = orm.getConnection();
-	try (Statement st = orm.getConnection().createStatement()) {
+	try (Statement st = con.createStatement()) {
 	    st.execute("DROP TABLE EMPLOYEE;");
 	    st.execute(
 		    "CREATE TABLE IF NOT EXISTS EMPLOYEE(id INT PRIMARY KEY AUTO_INCREMENT, first_name varchar(10), last_name varchar(10), salary int);");
@@ -37,7 +39,7 @@ public class Testing {
 	final List<Employee> insertedEmployees = new ArrayList<>();
 	final String sqlInserteEmployee = "INSERT INTO EMPLOYEE(first_name, last_name, salary) VALUES(?,?,?)";
 	try (PreparedStatement ps = con.prepareStatement(sqlInserteEmployee,PreparedStatement.RETURN_GENERATED_KEYS);) {
-	    for (int i = 0; i < count; i++) {
+	    for (int i = 1; i < count; i++) {
 
 		final Employee employee = new Employee();
 		
@@ -64,9 +66,17 @@ public class Testing {
     @Test(dataProvider = "employees")
     public void findAllTest(final ORM orm, final List<Employee> insertedList) {
 	final List<Employee> list = orm.findAll(Employee.class);
-	for (final Employee c : list) {
-	    assertTrue(insertedList.contains(c));
+	for (final Employee e : list) {
+	    assertTrue(insertedList.contains(e));
 	}
 	assertEquals(list.size(), insertedList.size());
+    }
+    
+    @Test(dataProvider = "employees")
+    public void findTest(final ORM orm, final List<Employee> insertedList) {
+	final Employee e = orm.find(Employee.class, "5");
+	System.out.println(e);
+	assertTrue(insertedList.contains(e));
+
     }
 }

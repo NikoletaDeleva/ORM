@@ -2,25 +2,15 @@ package com.egtinteractive.orm.utils;
 
 import static com.egtinteractive.orm.utils.ReflectionUtils.*;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
-import javax.sql.DataSource;
-
-import com.egtinteractive.orm.annotations.*;
 import com.egtinteractive.orm.exceptions.ORMmanegerException;
 import com.mysql.cj.jdbc.MysqlDataSource;
 
@@ -43,7 +33,7 @@ public class ORM implements Functionality, AutoCloseable {
 	    Connection connection = dataSource.getConnection();
 	    return new ORM(connection);
 	} catch (Exception e) {
-	    throw new ORMmanegerException();
+	    throw new ORMmanegerException(e);
 	}
 
     }
@@ -81,8 +71,29 @@ public class ORM implements Functionality, AutoCloseable {
 
     @Override
     public <E> E find(Class<E> classGen, String primaryKey) {
+	validate(classGen);
 
-	return null;
+	final Map<String, Field> mapColumnField = getColumnToFieldMap(classGen);
+
+	final String primaryColumn = findPrimaryField(classGen);
+
+	final String columnNames = getColumnNamesFromFields(mapColumnField);
+	final String table = getTableName(classGen);
+
+	final StringBuilder selectStatement = new StringBuilder();
+	selectStatement.append("SELECT ").append(columnNames).append(" FROM ").append(table).append(" WHERE ")
+		.append(primaryColumn).append("=").append(primaryKey).append(";");
+
+	try (final Statement statement = connection.createStatement();
+		final ResultSet resultSet = statement.executeQuery(selectStatement.toString())) {
+
+	    resultSet.next();
+	    return getEntity(classGen, resultSet, mapColumnField);
+
+	} catch (SQLException e) {
+	    throw new IllegalArgumentException(e);
+	}
+
     }
 
     @Override
@@ -90,7 +101,7 @@ public class ORM implements Functionality, AutoCloseable {
 	try {
 	    connection.close();
 	} catch (SQLException e) {
-	    throw new ORMmanegerException();
+	    throw new ORMmanegerException(e);
 	}
     }
 

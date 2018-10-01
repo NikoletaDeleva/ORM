@@ -77,7 +77,7 @@ public final class ReflectionUtils {
 	    final Class<?> foundClass = ((Field) f).getType();
 
 	    if (!allowedClasses.contains(foundClass)) {
-		throw new IllegalArgumentException(String.format("ID type: %s not in: %s", foundClass, allowedClasses));
+		throw new IllegalArgumentException();
 	    }
 	}
     }
@@ -109,10 +109,26 @@ public final class ReflectionUtils {
 	    }
 	    return instance;
 	} catch (InstantiationException | IllegalAccessException e) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(e);
 	} catch (IllegalArgumentException | SQLException e) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(e);
 	}
 
+    }
+
+    public static <E> String findPrimaryField(Class<?> classGen) {
+
+	final List<Field> fields = Arrays.asList(classGen.getDeclaredFields());
+
+	for (final Field f : fields) {
+	    if (f.isAnnotationPresent(Id.class)) {
+		if(f.isAnnotationPresent(Column.class) && !f.getAnnotation(Column.class).name().equals("")) {
+		    return f.getAnnotation(Column.class).name();
+		}else {
+		    return f.getName();
+		}
+	    }
+	}
+	throw new IllegalArgumentException("No primary key");
     }
 }
