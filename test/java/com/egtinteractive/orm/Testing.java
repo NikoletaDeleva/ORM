@@ -20,12 +20,11 @@ import com.egtinteractive.orm.utils.DBCredentials;
 import com.egtinteractive.orm.utils.ORM;
 
 public class Testing {
-    @BeforeTest
-    
-    @DataProvider(name = "employees")
-    public Object[][] insertCars() {
-	DBCredentials credentials = new DBCredentials();
-	final ORM orm = ORM.getConnectionAndCraete(credentials);
+    DBCredentials credentials = new DBCredentials();
+    final ORM orm = ORM.getConnectionAndCraete(credentials);
+	    
+	    
+    public List<Employee> insertEmployees() {
 	final int count = ThreadLocalRandom.current().nextInt(10, 30);
 	Connection con = orm.getConnection();
 	try (Statement st = con.createStatement()) {
@@ -38,11 +37,12 @@ public class Testing {
 
 	final List<Employee> insertedEmployees = new ArrayList<>();
 	final String sqlInserteEmployee = "INSERT INTO EMPLOYEE(first_name, last_name, salary) VALUES(?,?,?)";
-	try (PreparedStatement ps = con.prepareStatement(sqlInserteEmployee,PreparedStatement.RETURN_GENERATED_KEYS);) {
+	try (PreparedStatement ps = con.prepareStatement(sqlInserteEmployee,
+		PreparedStatement.RETURN_GENERATED_KEYS);) {
 	    for (int i = 1; i < count; i++) {
 
 		final Employee employee = new Employee();
-		
+
 		employee.setFirstName("niki" + i);
 		employee.setLastName("deleva" + i);
 		employee.setSalary(i * 1000);
@@ -60,23 +60,25 @@ public class Testing {
 	} catch (SQLException e) {
 	    throw new IllegalArgumentException(e);
 	}
-	return new Object[][] { { orm, insertedEmployees } };
-    }
-
-    @Test(dataProvider = "employees")
-    public void findAllTest(final ORM orm, final List<Employee> insertedList) {
-	final List<Employee> list = orm.findAll(Employee.class);
-	for (final Employee e : list) {
-	    assertTrue(insertedList.contains(e));
-	}
-	assertEquals(list.size(), insertedList.size());
+	return insertedEmployees;
     }
     
-    @Test(dataProvider = "employees")
-    public void findTest(final ORM orm, final List<Employee> insertedList) {
+    final List<Employee> insertedEmployees = insertEmployees();
+    
+    @Test
+    public void findAllTest() {
+	final List<Employee> list = orm.findAll(Employee.class);
+	for (final Employee e : list) {
+	    assertTrue(insertedEmployees.contains(e));
+	}
+	assertEquals(list.size(), insertedEmployees.size());
+    }
+
+    @Test
+    public void findTest() {
 	final Employee e = orm.find(Employee.class, "5");
 	System.out.println(e);
-	assertTrue(insertedList.contains(e));
+	assertTrue(insertedEmployees.contains(e));
 
     }
 }
