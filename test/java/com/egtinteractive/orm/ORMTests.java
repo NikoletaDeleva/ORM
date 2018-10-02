@@ -7,6 +7,7 @@ import java.util.List;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.egtinteractive.orm.classes.*;
 import com.egtinteractive.orm.utils.DBCredentials;
 import com.egtinteractive.orm.utils.ORM;
 
@@ -33,6 +34,14 @@ public class ORMTests {
 
     @DataProvider
     public Object[][] getTestData() {
-	return new Object[][] { { Employee.class } };
+	return new Object[][] {
+	    { Employee.class }, 
+	    { EmployeeWithManyId.class }, 
+	    { EmployeeWithoutEntity.class },
+	    { EmployeeWithoutEntityTable.class }, 
+	    { EmployeeWithoutEntityTableId.class },
+	    { EmployeeWithoutId.class }, 
+	    { EmployeeWithoutTable.class }
+	};
     }
 }

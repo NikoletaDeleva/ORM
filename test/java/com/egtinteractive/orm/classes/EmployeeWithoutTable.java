@@ -1,10 +1,12 @@
-package com.egtinteractive.orm;
+package com.egtinteractive.orm.classes;
 
-import com.egtinteractive.orm.annotations.*;
+import com.egtinteractive.orm.annotations.Column;
+import com.egtinteractive.orm.annotations.Entity;
+import com.egtinteractive.orm.annotations.Id;
+import com.egtinteractive.orm.annotations.Table;
 
 @Entity
-@Table(name = "EMPLOYEE")
-public class Employee {
+public class EmployeeWithoutTable {
     @Id
     @Column(name = "id")
     private int id;
@@ -18,10 +20,10 @@ public class Employee {
     @Column(name = "salary")
     private int salary;
 
-    public Employee() {
+    public EmployeeWithoutTable() {
     }
 
-    public Employee(String fname, String lname, int salary) {
+    public EmployeeWithoutTable(String fname, String lname, int salary) {
 	this.firstName = fname;
 	this.lastName = lname;
 	this.salary = salary;
@@ -61,7 +63,7 @@ public class Employee {
 
     @Override
     public String toString() {
-	return this.getId() + " " +this.getFirstName() + " " + this.getLastName() + " " + this.getSalary();
+	return this.getId() + " " + this.getFirstName() + " " + this.getLastName() + " " + this.getSalary();
     }
 
     @Override
@@ -83,7 +85,7 @@ public class Employee {
 	    return false;
 	if (getClass() != obj.getClass())
 	    return false;
-	Employee other = (Employee) obj;
+	EmployeeWithoutTable other = (EmployeeWithoutTable) obj;
 	if (firstName == null) {
 	    if (other.firstName != null)
 		return false;
@@ -100,5 +102,5 @@ public class Employee {
 	    return false;
 	return true;
     }
-    
+
 }
