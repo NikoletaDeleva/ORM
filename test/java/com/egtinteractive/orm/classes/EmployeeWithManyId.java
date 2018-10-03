@@ -4,7 +4,7 @@ import com.egtinteractive.orm.annotations.*;
 
 @Entity
 @Table(name = "EMPLOYEE")
-public class EmployeeWithManyId {
+public class EmployeeWithManyId implements EmplInterface {
     @Id
     @Column(name = "id")
     private int id;

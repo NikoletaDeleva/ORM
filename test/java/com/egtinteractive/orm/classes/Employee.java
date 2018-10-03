@@ -4,7 +4,7 @@ import com.egtinteractive.orm.annotations.*;
 
 @Entity
 @Table(name = "EMPLOYEE")
-public class Employee {
+public class Employee implements EmplInterface {
     @Id
     @Column(name = "id")
     private int id;
@@ -27,41 +27,49 @@ public class Employee {
 	this.salary = salary;
     }
 
+    @Override
     public int getId() {
 	return id;
     }
 
+    @Override
     public void setId(int id) {
 	this.id = id;
     }
 
+    @Override
     public String getFirstName() {
 	return firstName;
     }
 
+    @Override
     public void setFirstName(String first_name) {
 	this.firstName = first_name;
     }
 
+    @Override
     public String getLastName() {
 	return lastName;
     }
 
+    @Override
     public void setLastName(String last_name) {
 	this.lastName = last_name;
     }
 
+    @Override
     public int getSalary() {
 	return salary;
     }
 
+    @Override
     public void setSalary(int salary) {
 	this.salary = salary;
     }
 
     @Override
     public String toString() {
-	return this.getId() + " " +this.getFirstName() + " " + this.getLastName() + " " + this.getSalary();
+	return this.getId() + " " + this.getFirstName() + " " + this.getLastName() + " " + this.getSalary();
     }
 
     @Override
@@ -100,5 +108,5 @@ public class Employee {
 	    return false;
 	return true;
     }
-    
+
 }

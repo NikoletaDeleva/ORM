@@ -2,7 +2,6 @@ package com.egtinteractive.orm.utils;
 
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import static java.lang.reflect.Modifier.*;
 
@@ -99,18 +98,16 @@ public final class ReflectionUtils {
     }
 
     public static <E> E getEntity(Class<?> classGen, ResultSet resultSet, Map<String, Field> map) {
-	E instance;
 	try {
-	    instance = (E) classGen.newInstance();
+	    @SuppressWarnings("unchecked")
+	    E instance = (E) classGen.newInstance();
 	    for (final String s : map.keySet()) {
 		final Field f = map.get(s);
 		f.setAccessible(true);
 		f.set(instance, resultSet.getObject(s));
 	    }
 	    return instance;
-	} catch (InstantiationException | IllegalAccessException e) {
-	    throw new IllegalArgumentException(e);
-	} catch (IllegalArgumentException | SQLException e) {
+	} catch (Exception e) {
 	    throw new IllegalArgumentException(e);
 	}
 

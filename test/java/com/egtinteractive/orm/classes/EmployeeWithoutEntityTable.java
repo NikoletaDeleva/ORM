@@ -3,7 +3,7 @@ package com.egtinteractive.orm.classes;
 import com.egtinteractive.orm.annotations.Column;
 import com.egtinteractive.orm.annotations.Id;
 
-public class EmployeeWithoutEntityTable {
+public class EmployeeWithoutEntityTable implements EmplInterface {
     @Id
     @Column(name = "id")
     private int id;
