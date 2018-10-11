@@ -1,11 +1,13 @@
 package com.egtinteractive.orm.exceptions;
 
-
-public class ORMmanegerException extends RuntimeException {
+/*
+ * TODO wrong spelling 
+ */
+public class ORMManagerException extends RuntimeException {
 
     private static final long serialVersionUID = 3466291134086693361L;
 
-    public ORMmanegerException(Exception e) {
+    public ORMManagerException(Exception e) {
 	super(e);
     }
 

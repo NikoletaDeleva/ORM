@@ -1,5 +1,9 @@
 package com.egtinteractive.orm.exceptions;
 
+/*
+ * TODO not used anywhere
+ * 
+ */
 public class ColumnNameNotFoundException extends Exception {
 
     private static final long serialVersionUID = 1L;

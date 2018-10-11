@@ -1,10 +1,14 @@
 package com.egtinteractive.orm.classes;
 
-import com.egtinteractive.orm.annotations.*;
+import com.egtinteractive.orm.annotations.Column;
+import com.egtinteractive.orm.annotations.Entity;
+import com.egtinteractive.orm.annotations.Id;
+import com.egtinteractive.orm.annotations.Table;
+import com.egtinteractive.orm.annotations.Transient;
 
 @Entity
 @Table(name = "EMPLOYEE")
-public class EmployeeWithManyId implements EmplInterface {
+public class EmployeeWithTransient extends Person {
     @Id
     @Column(name = "id")
     private int id;
@@ -12,17 +16,16 @@ public class EmployeeWithManyId implements EmplInterface {
     @Column(name = "first_name")
     private String firstName;
 
-    @Column(name = "last_name")
+    @Transient
     private String lastName;
 
-    @Id
-    @Column(name = "salary")
+    @Transient
     private int salary;
 
-    public EmployeeWithManyId() {
+    public EmployeeWithTransient() {
     }
 
-    public EmployeeWithManyId(String fname, String lname, int salary) {
+    public EmployeeWithTransient(String fname, String lname, int salary) {
 	this.firstName = fname;
 	this.lastName = lname;
 	this.salary = salary;
@@ -60,12 +63,10 @@ public class EmployeeWithManyId implements EmplInterface {
 	this.salary = salary;
     }
 
-    @Override
     public String toString() {
-	return this.getId() + " " +this.getFirstName() + " " + this.getLastName() + " " + this.getSalary();
+	return this.getId() + " " + this.getFirstName() + " " + this.getLastName() + " " + this.getSalary();
     }
 
-    @Override
     public int hashCode() {
 	final int prime = 31;
 	int result = 1;
@@ -76,7 +77,6 @@ public class EmployeeWithManyId implements EmplInterface {
 	return result;
     }
 
-    @Override
     public boolean equals(Object obj) {
 	if (this == obj)
 	    return true;
@@ -84,7 +84,7 @@ public class EmployeeWithManyId implements EmplInterface {
 	    return false;
 	if (getClass() != obj.getClass())
 	    return false;
-	EmployeeWithManyId other = (EmployeeWithManyId) obj;
+	EmployeeWithTransient other = (EmployeeWithTransient) obj;
 	if (firstName == null) {
 	    if (other.firstName != null)
 		return false;

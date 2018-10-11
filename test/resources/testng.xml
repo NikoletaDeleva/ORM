@@ -1,0 +1,23 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="softwaretestingmaterial" parallel="false">
+	<test name="testOne">
+		<classes>
+			<class name="com.egtinteractive.orm.AnnotationTesting" />
+		</classes>
+	</test>
+	<test name="testTwo">
+		<classes>
+			<class name="com.egtinteractive.orm.ORMTest" />
+		</classes>
+	</test>
+	<test name="testThree">
+		<classes>
+			<class name="com.egtinteractive.orm.TestSomeColumnLess" />
+		</classes>
+	</test>
+	<test name="testFour">
+		<classes>
+			<class name="com.egtinteractive.orm.TestWithTransient" />
+		</classes>
+	</test>
+</suite>

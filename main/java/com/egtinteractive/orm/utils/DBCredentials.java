@@ -7,29 +7,34 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class DBCredentials {
-    private final static String CONFIG_PATH = "src" + File.separator + "main" + File.separator + "resources"
-	    + File.separator + "configuration.properties";
-    private final String URL;
-    private final String USER;
-    private final String PASSWORD;
-    final String database;
-    final String port;
-    
-    public DBCredentials() {
-	final Properties properties = getCredentials();
-	this.USER = properties.getProperty("dbuser");
-	this.PASSWORD = properties.getProperty("dbpassword");
+    private final String url;
+    private final String user;
+    private final String password;
+    private final String database;
+    private final int port;
+
+    public DBCredentials(String path) {
+	final Properties properties = getCredentials(path);
+
+	validate(properties);
+
+	this.user = properties.getProperty("dbuser");
+	this.password = properties.getProperty("dbpassword");
 	final String host = properties.getProperty("host");
-	this.port = properties.getProperty("port");
+	this.port = Integer.parseInt(properties.getProperty("port"));
 	this.database = properties.getProperty("database");
 
-	this.URL = "jdbc:mysql:" + File.separator + File.separator + host + ":" + port + File.separator + database;
+	StringBuilder urlBuild = new StringBuilder();
+	urlBuild.append("jdbc:mysql:").append(File.separator).append(File.separator).append(host).append(":")
+		.append(port).append(File.separator).append(database);
+
+	this.url = urlBuild.toString();
     }
 
-    private Properties getCredentials() {
+    private Properties getCredentials(String path) {
 	final Properties properties = new Properties();
 
-	try (InputStream input = new FileInputStream(CONFIG_PATH);) {
+	try (InputStream input = new FileInputStream(path);) {
 	    properties.load(input);
 	    return properties;
 	} catch (IOException e) {
@@ -37,24 +42,39 @@ public class DBCredentials {
 	}
     }
 
-    public String getURL() {
-	return URL;
+    public String getUrl() {
+	return url;
     }
 
-    public String getUSER() {
-	return USER;
+    public String getUser() {
+	return user;
     }
 
-    public String getPort() {
-        return port;
+    public int getPort() {
+	return port;
     }
 
-    public String getPASSWORD() {
-	return PASSWORD;
+    public String getPassword() {
+	return password;
     }
 
-    public String getDBNane() {
+    public String getDBName() {
 	return database;
+    }
+
+    private void validate(Properties properties) {
+	if (!properties.containsKey("dbpassword")) {
+	    throw new IllegalArgumentException("Password property is missing!");
+	} else if (!properties.containsKey("host")) {
+	    throw new IllegalArgumentException("Host property is missing!");
+	} else if (!properties.containsKey("port")) {
+	    throw new IllegalArgumentException("Port property is missing!");
+	} else if (!properties.containsKey("database")) {
+	    throw new IllegalArgumentException("DataBase property is missing!");
+	} else if (!properties.containsKey("dbuser")) {
+	    throw new IllegalArgumentException("User property is missing!");
+	}
+
     }
 
 }

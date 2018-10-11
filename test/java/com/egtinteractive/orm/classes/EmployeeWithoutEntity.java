@@ -5,7 +5,7 @@ import com.egtinteractive.orm.annotations.Id;
 import com.egtinteractive.orm.annotations.Table;
 
 @Table(name = "EMPLOYEE")
-public class EmployeeWithoutEntity implements EmplInterface{
+public class EmployeeWithoutEntity {
     @Id
     @Column(name = "id")
     private int id;

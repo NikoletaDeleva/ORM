@@ -2,30 +2,24 @@ package com.egtinteractive.orm.classes;
 
 import com.egtinteractive.orm.annotations.Column;
 import com.egtinteractive.orm.annotations.Entity;
+import com.egtinteractive.orm.annotations.Id;
 import com.egtinteractive.orm.annotations.Table;
 
 @Entity
 @Table(name = "EMPLOYEE")
-public class EmployeeWithoutId implements EmplInterface{
+public class EmployeeNotAllColumns extends Person {
+    @Id
     @Column(name = "id")
     private int id;
 
     @Column(name = "first_name")
     private String firstName;
 
-    @Column(name = "last_name")
-    private String lastName;
-
-    @Column(name = "salary")
-    private int salary;
-
-    public EmployeeWithoutId() {
+    public EmployeeNotAllColumns() {
     }
 
-    public EmployeeWithoutId(String fname, String lname, int salary) {
+    public EmployeeNotAllColumns(String fname) {
 	this.firstName = fname;
-	this.lastName = lname;
-	this.salary = salary;
     }
 
     public int getId() {
@@ -44,39 +38,18 @@ public class EmployeeWithoutId implements EmplInterface{
 	this.firstName = first_name;
     }
 
-    public String getLastName() {
-	return lastName;
-    }
-
-    public void setLastName(String last_name) {
-	this.lastName = last_name;
-    }
-
-    public int getSalary() {
-	return salary;
-    }
-
-    public void setSalary(int salary) {
-	this.salary = salary;
-    }
-
-    @Override
     public String toString() {
-	return this.getId() + " " + this.getFirstName() + " " + this.getLastName() + " " + this.getSalary();
+	return this.getId() + " " + this.getFirstName();
     }
 
-    @Override
     public int hashCode() {
 	final int prime = 31;
 	int result = 1;
 	result = prime * result + ((firstName == null) ? 0 : firstName.hashCode());
 	result = prime * result + id;
-	result = prime * result + ((lastName == null) ? 0 : lastName.hashCode());
-	result = prime * result + salary;
 	return result;
     }
 
-    @Override
     public boolean equals(Object obj) {
 	if (this == obj)
 	    return true;
@@ -84,7 +57,7 @@ public class EmployeeWithoutId implements EmplInterface{
 	    return false;
 	if (getClass() != obj.getClass())
 	    return false;
-	EmployeeWithoutId other = (EmployeeWithoutId) obj;
+	EmployeeNotAllColumns other = (EmployeeNotAllColumns) obj;
 	if (firstName == null) {
 	    if (other.firstName != null)
 		return false;
@@ -92,13 +65,7 @@ public class EmployeeWithoutId implements EmplInterface{
 	    return false;
 	if (id != other.id)
 	    return false;
-	if (lastName == null) {
-	    if (other.lastName != null)
-		return false;
-	} else if (!lastName.equals(other.lastName))
-	    return false;
-	if (salary != other.salary)
-	    return false;
 	return true;
     }
+
 }
